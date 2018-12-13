@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1q3wfxc" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.2.3">
+  <bpmn:process id="loanChecker" name="Loan Checker" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1f63ln3" name="Loan Request received">
+      <bpmn:outgoing>SequenceFlow_068hl0b</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_068hl0b" sourceRef="StartEvent_1f63ln3" targetRef="Task_0zyfcj3" />
+    <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_157g6s9" name="Loan Request processed">
+      <bpmn:incoming>SequenceFlow_1rtjy5n</bpmn:incoming>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:userTask id="Task_0zyfcj3" name="Check the request">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="wordInput" label="Word" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_068hl0b</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1g8pjsi</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1g8pjsi" sourceRef="Task_0zyfcj3" targetRef="Task_1vg2nra" />
+    <bpmn:sequenceFlow id="SequenceFlow_1rtjy5n" sourceRef="Task_1vg2nra" targetRef="IntermediateThrowEvent_157g6s9" />
+    <bpmn:serviceTask id="Task_1vg2nra" name="Print the Word" camunda:class="de.urr4.learning.camunda.beans.PrintTheWordDelegate">
+      <bpmn:incoming>SequenceFlow_1g8pjsi</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1rtjy5n</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="loanChecker">
+      <bpmndi:BPMNShape id="StartEvent_1f63ln3_di" bpmnElement="StartEvent_1f63ln3">
+        <dc:Bounds x="208" y="186" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="191" y="229" width="70" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_068hl0b_di" bpmnElement="SequenceFlow_068hl0b">
+        <di:waypoint x="244" y="204" />
+        <di:waypoint x="348" y="204" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="IntermediateThrowEvent_157g6s9_di" bpmnElement="IntermediateThrowEvent_157g6s9">
+        <dc:Bounds x="737" y="186" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="720" y="229" width="70" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1j6mngf_di" bpmnElement="Task_0zyfcj3">
+        <dc:Bounds x="348" y="164" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1g8pjsi_di" bpmnElement="SequenceFlow_1g8pjsi">
+        <di:waypoint x="448" y="204" />
+        <di:waypoint x="520" y="204" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1rtjy5n_di" bpmnElement="SequenceFlow_1rtjy5n">
+        <di:waypoint x="620" y="204" />
+        <di:waypoint x="737" y="204" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1eqxtzd_di" bpmnElement="Task_1vg2nra">
+        <dc:Bounds x="520" y="164" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
