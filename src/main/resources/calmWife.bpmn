@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_04p1b7r" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.2.3">
+  <bpmn:process id="calmWife" name="Frau beruhigen" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Start">
+      <bpmn:outgoing>SequenceFlow_14wd4gb</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_14wd4gb" sourceRef="StartEvent_1" targetRef="moodEvaluate" />
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1om2ada">
+      <bpmn:incoming>SequenceFlow_0giph1y</bpmn:incoming>
+      <bpmn:outgoing>normalFlow</bpmn:outgoing>
+      <bpmn:outgoing>badFlow</bpmn:outgoing>
+      <bpmn:outgoing>superFlow</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0giph1y" sourceRef="moodEvaluate" targetRef="ExclusiveGateway_1om2ada" />
+    <bpmn:sequenceFlow id="normalFlow" name="Normal" sourceRef="ExclusiveGateway_1om2ada" targetRef="complimentTask">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${mood != 'super' &amp;&amp; mood !='bad'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="badFlow" name="Schlecht" sourceRef="ExclusiveGateway_1om2ada" targetRef="Task_0ufvo88">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${mood == 'bad'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_08ho0u1">
+      <bpmn:incoming>SequenceFlow_05c1j9q</bpmn:incoming>
+      <bpmn:outgoing>meFlow</bpmn:outgoing>
+      <bpmn:outgoing>otherFlow</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_05c1j9q" sourceRef="Task_0ufvo88" targetRef="ExclusiveGateway_08ho0u1" />
+    <bpmn:sequenceFlow id="meFlow" name="Ich" sourceRef="ExclusiveGateway_08ho0u1" targetRef="saySorryTask">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${reason == 'Stefan'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_08i3apb" sourceRef="saySorryTask" targetRef="complimentTask" />
+    <bpmn:sequenceFlow id="SequenceFlow_0zdjjjm" sourceRef="talkTo" targetRef="calm" />
+    <bpmn:sequenceFlow id="superFlow" name="Super" sourceRef="ExclusiveGateway_1om2ada" targetRef="makeFood">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${mood == 'super'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_0592xxb">
+      <bpmn:incoming>SequenceFlow_17it0su</bpmn:incoming>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_17it0su" sourceRef="makeFood" targetRef="IntermediateThrowEvent_0592xxb" />
+    <bpmn:sequenceFlow id="SequenceFlow_01qi7h6" sourceRef="complimentTask" targetRef="moodEvaluate" />
+    <bpmn:sequenceFlow id="SequenceFlow_0bg9nyt" sourceRef="calm" targetRef="moodEvaluate" />
+    <bpmn:sequenceFlow id="otherFlow" name="Anderer" sourceRef="ExclusiveGateway_08ho0u1" targetRef="talkTo">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${reason != 'Stefan'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="moodEvaluate" name="Nach Laune fragen">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="mood" label="Laune?" type="enum">
+            <camunda:value id="super" name="Super" />
+            <camunda:value id="normal" name="Normal" />
+            <camunda:value id="bad" name="Schlecht" />
+          </camunda:formField>
+        </camunda:formData>
+        <camunda:taskListener class="de.urr4.learning.camunda.listeners.MoodPrinter" event="complete" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_14wd4gb</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_01qi7h6</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0bg9nyt</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0giph1y</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="makeFood" name="Essen machen" camunda:class="de.urr4.learning.camunda.delegates.FoodMaker">
+      <bpmn:incoming>superFlow</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_17it0su</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:businessRuleTask id="talkTo" name="Gut zureden" camunda:resultVariable="words" camunda:decisionRef="talkToDMN" camunda:mapDecisionResult="singleEntry">
+      <bpmn:extensionElements>
+        <camunda:executionListener class="de.urr4.learning.camunda.listeners.DecisionPrinter" event="end" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>otherFlow</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0zdjjjm</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:userTask id="calm" name="Trösten">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="niceWords" label="Nice Words" type="string" />
+        </camunda:formData>
+        <camunda:taskListener class="de.urr4.learning.camunda.listeners.CalmPrinter" event="complete" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0zdjjjm</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0bg9nyt</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_0ufvo88" name="Grund erfragen">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="reason" label="Grund?" type="string" />
+        </camunda:formData>
+        <camunda:taskListener class="de.urr4.learning.camunda.listeners.ReasonPrinter" event="complete" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>badFlow</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_05c1j9q</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="saySorryTask" name="Entschuldigen" camunda:class="de.urr4.learning.camunda.delegates.SaySorry">
+      <bpmn:incoming>meFlow</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_08i3apb</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="complimentTask" name="Kompliment machen" camunda:class="de.urr4.learning.camunda.delegates.Complimenter">
+      <bpmn:incoming>normalFlow</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_08i3apb</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_01qi7h6</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="calmWife">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="148" y="326" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="154" y="369" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_14wd4gb_di" bpmnElement="SequenceFlow_14wd4gb">
+        <di:waypoint x="184" y="344" />
+        <di:waypoint x="252" y="344" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1om2ada_di" bpmnElement="ExclusiveGateway_1om2ada" isMarkerVisible="true">
+        <dc:Bounds x="574" y="319" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0giph1y_di" bpmnElement="SequenceFlow_0giph1y">
+        <di:waypoint x="352" y="344" />
+        <di:waypoint x="574" y="344" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ksrmuh_di" bpmnElement="normalFlow">
+        <di:waypoint x="599" y="369" />
+        <di:waypoint x="599" y="442" />
+        <di:waypoint x="409" y="442" />
+        <di:waypoint x="409" y="504" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="486" y="424" width="36" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_06bpa1d_di" bpmnElement="badFlow">
+        <di:waypoint x="607" y="361" />
+        <di:waypoint x="628" y="403" />
+        <di:waypoint x="666" y="403" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="623" y="409" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_08ho0u1_di" bpmnElement="ExclusiveGateway_08ho0u1" isMarkerVisible="true">
+        <dc:Bounds x="798" y="378" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_05c1j9q_di" bpmnElement="SequenceFlow_05c1j9q">
+        <di:waypoint x="766" y="403" />
+        <di:waypoint x="798" y="403" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1j86mih_di" bpmnElement="meFlow">
+        <di:waypoint x="823" y="428" />
+        <di:waypoint x="823" y="504" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="831" y="463" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_08i3apb_di" bpmnElement="SequenceFlow_08i3apb">
+        <di:waypoint x="773" y="544" />
+        <di:waypoint x="459" y="544" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0zdjjjm_di" bpmnElement="SequenceFlow_0zdjjjm">
+        <di:waypoint x="862" y="145" />
+        <di:waypoint x="766" y="145" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0svvdr8_di" bpmnElement="superFlow">
+        <di:waypoint x="599" y="319" />
+        <di:waypoint x="599" y="280" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="612" y="297" width="31" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="IntermediateThrowEvent_0592xxb_di" bpmnElement="IntermediateThrowEvent_0592xxb">
+        <dc:Bounds x="447" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_17it0su_di" bpmnElement="SequenceFlow_17it0su">
+        <di:waypoint x="549" y="240" />
+        <di:waypoint x="483" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_01qi7h6_di" bpmnElement="SequenceFlow_01qi7h6">
+        <di:waypoint x="359" y="544" />
+        <di:waypoint x="302" y="544" />
+        <di:waypoint x="302" y="384" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0bg9nyt_di" bpmnElement="SequenceFlow_0bg9nyt">
+        <di:waypoint x="666" y="145" />
+        <di:waypoint x="302" y="145" />
+        <di:waypoint x="302" y="304" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0pjoqxm_di" bpmnElement="otherFlow">
+        <di:waypoint x="849" y="403" />
+        <di:waypoint x="912" y="403" />
+        <di:waypoint x="912" y="185" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="861" y="385" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_165hq8g_di" bpmnElement="moodEvaluate">
+        <dc:Bounds x="252" y="304" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1nbjzxx_di" bpmnElement="makeFood">
+        <dc:Bounds x="549" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BusinessRuleTask_11pzn4z_di" bpmnElement="talkTo">
+        <dc:Bounds x="862" y="105" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_0knjsu3_di" bpmnElement="calm">
+        <dc:Bounds x="666" y="105" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_127w5r9_di" bpmnElement="Task_0ufvo88">
+        <dc:Bounds x="666" y="363" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0ryj19u_di" bpmnElement="saySorryTask">
+        <dc:Bounds x="773" y="504" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1pn7tj6_di" bpmnElement="complimentTask">
+        <dc:Bounds x="359" y="504" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

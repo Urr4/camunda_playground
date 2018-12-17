@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="Definitions_1b2gebk" name="DRD" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="talkToDMN" name="Gut Zureden">
+    <decisionTable id="decisionTable_1" hitPolicy="FIRST">
+      <input id="input_1" label="Grund" camunda:inputVariable="reason">
+        <inputExpression id="inputExpression_1" typeRef="string">
+          <text></text>
+        </inputExpression>
+      </input>
+      <output id="output_1" label="words" name="words" typeRef="string" />
+      <rule id="DecisionRule_107d4zm">
+        <inputEntry id="UnaryTests_1qyjzx8">
+          <text>"Arbeit"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0iu246o">
+          <text>"Ist nur Arbeit!"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1in6400">
+        <inputEntry id="UnaryTests_1ju6s6j">
+          <text>"Familie"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1a9xlcu">
+          <text>"Die sind alle doof!"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0avnuqs">
+        <inputEntry id="UnaryTests_1jliyvt">
+          <text>"Freunde"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1tggh1p">
+          <text>"Die sind alle hässlich!"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0jbni7j">
+        <inputEntry id="UnaryTests_1liaq0g">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_18b3guv">
+          <text>"Was ist los?"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
